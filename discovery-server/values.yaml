@@ -1,0 +1,22 @@
+replicaCount: 2
+image:
+  repository: registry-vpc.ap-southeast-1.aliyuncs.com/ccfox/eureka
+  tag: 1.5.13
+  pullPolicy: Always
+service:
+  enabled: true
+  type: LoadBalancer
+  externalPort: 8761
+  internalPort: 8761
+management:
+  endpointsEnabled: true
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: evn
+          operator: In
+          values:
+          - test

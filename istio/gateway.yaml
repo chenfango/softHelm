@@ -1,0 +1,173 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: axd-admin
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - admin.aixiangdao.tech
+    port:
+      name: https-admin
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/admin.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/admin.crt
+  - hosts:
+    - rms.aixiangdao.com
+    port:
+      name: https-rms
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/rms.aixiangdao.com.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/rms.aixiangdao.com.pem
+  - hosts:
+    - admin.aixiangdao.tech
+    port:
+      name: http-admin
+      number: 80
+      protocol: HTTP
+  - hosts:
+    - rms.aixiangdao.com
+    port:
+      name: http-rms
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: axd-gateway-admin
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - api.admin.aixiangdao.tech
+    port:
+      name: https-api-admin
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/api.admin.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/api.admin.crt
+  - hosts:
+    - api.admin.aixiangdao.tech
+    port:
+      name: http-api-admin
+      number: 80
+      protocol: HTTP
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: axd-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - api.aixiangdao.tech
+    port:
+      name: https-api
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/api.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/api.crt
+  - hosts:
+    - api.aixiangdao.tech
+    port:
+      name: http-api
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: axd-activity-ui
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - activity.aixiangdao.tech
+    port:
+      name: https-activity
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/activity-ui.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/activity-ui.crt
+  - hosts:
+    - activity.aixiangdao.tech
+    port:
+      name: http-activity
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: aixiangdao-pushm
+spec:
+  selector:
+    app.kubernetes.io/instance: axd-ingressgateway
+  servers:
+  - hosts:
+    - pushm.api.aixiangdao.com
+    port:
+      name: https-pushm-com
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/pushm.api.aixiangdao.tech.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/pushm.api.aixiangdao.tech.pem
+  - hosts:
+    - pushm.api.aixiangdao.com
+    port:
+      name: http-pushm-com
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: aixiangdao-pushn
+spec:
+  selector:
+    app.kubernetes.io/instance: axd-ingressgateway
+  servers:
+  - hosts:
+    - pushn.api.aixiangdao.com
+    port:
+      name: https-pushn-com
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/istio-system/pushn.api.aixiangdao.tech.key
+      serverCertificate: /etc/istio/ingressgateway-certs/istio-system/pushn.api.aixiangdao.tech.pem
+  - hosts:
+    - pushn.api.aixiangdao.com
+    port:
+      name: http-pushn-com
+      number: 80
+      protocol: HTTP
+

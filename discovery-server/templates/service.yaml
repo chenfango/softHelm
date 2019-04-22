@@ -1,0 +1,23 @@
+{{ if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "eureka.fullname" . }}-svc
+  labels:
+    app: {{ template "eureka.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-id: lb-t4nll87cfnnbbhyguvpr7
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.externalPort }}
+      targetPort: {{ .Values.service.internalPort }}
+      protocol: TCP
+      name: eureka-listening-port
+  selector:
+    app: {{ template "eureka.fullname" . }}
+    release: {{ .Release.Name }}
+{{ end }}

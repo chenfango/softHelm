@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "upsource.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "upsource.name" . }}
+    helm.sh/chart: {{ include "upsource.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "upsource.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "upsource.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          volumeMounts:
+          - name: "d-wz91dm5hcsr5razomnrr"
+            mountPath: "/opt/upsource/data"
+          - name: "conf"
+            mountPath: "/opt/upsource/conf"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe: 
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+        - name: "d-wz91dm5hcsr5razomnrr"
+          flexVolume:
+            driver: "alicloud/disk"
+            fsType: "ext4"
+            options:
+              volumeId: "d-wz91dm5hcsr5razomnrr"
+        - flexVolume:
+            driver: alicloud/oss
+            options:
+              akId: LTAI8amibVfB3e3A
+              akSecret: XQalqWqwUWBGC7cwf9na4LigBALoyX
+              bucket: upsource-conf
+              otherOpts: -o max_stat_cache_size=0 -o allow_other
+              url: oss-cn-shenzhen-internal.aliyuncs.com
+          name: conf
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

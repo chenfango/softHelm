@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+data:
+  config.yml: |-
+    global:
+      resolve_timeout: 5m
+      # smtp_from: eatted@163.com
+      # smtp_smarthost: smtp.163.com:25
+      # smtp_auth_username: eatted@163.com
+      # smtp_auth_password: <secret>
+      # pagerduty_url: https://events.pagerduty.com/v2/enqueue
+      # hipchat_api_url: https://api.hipchat.com/
+      # opsgenie_api_url: https://api.opsgenie.com/
+      # victorops_api_url: https://alert.victorops.com/integrations/generic/20131114/alert/
+    route:
+      receiver: send_to_dingding_prod
+      group_by:
+      - job
+      - instance
+      - host
+      routes:
+      - match:
+          instance: mysql
+        group_by: [product, environment]
+        receiver: 'frontend-pager'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+    inhibit_rules:
+    - source_match:
+        severity: warning
+      equal:
+      - alertname
+      - instance
+    receivers:
+    - name: send_to_dingding_prod
+      webhook_configs:
+      - send_resolved: false
+        url: http://dingtalk:8060/dingtalk/prod/send
+    templates:
+    - /etc/alertmanager/template/*.tmpl

@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: istio-grafana
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - grafana.aixiangdao.tech
+    port:
+      name: http-grafana
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: istio-grafana
+spec:
+  gateways:
+  - istio-grafana
+  hosts:
+  - grafana.aixiangdao.tech
+  http:
+  - route:
+    - destination:
+        host: grafana.istio-system.svc.cluster.local

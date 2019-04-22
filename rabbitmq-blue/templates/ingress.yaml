@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: axd-mq-server
+    version: v3
+  name: axd-mq-server
+spec:
+  rules:
+  - host: blue.rabbitmq.aixiangdao.tech
+    http:
+      paths:
+      - backend:
+          serviceName: axd-mq-server
+          servicePort: 15672
+

@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    version: {{ .Values.image.tag | default "pro" }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      version: {{ .Values.image.tag | default "pro" }}
+  serviceName: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        version: {{ .Values.image.tag | default "pro" }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - java
+        - -server
+        - -Xmx500M
+        - -Xms500M
+        - -Xss256k
+        - -XX:+UseG1GC
+        - -Dspring.profiles.active=test
+        - -jar
+        - /opt/newcoin-gateway-server.jar
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+      #   volumeMounts:
+      #   - mountPath: /opt/bootstrap.yml
+      #     name: newcoin-common-server-config
+      # volumes:
+      # - configMap:
+      #     name: newcoin-common-server-config 
+      #   name: newcoin-common-server-config
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

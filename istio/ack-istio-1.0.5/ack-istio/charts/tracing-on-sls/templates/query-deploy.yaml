@@ -1,0 +1,137 @@
+{{- if .Values.query.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "jaeger.query.name" . }}
+  labels:
+    app: {{ template "jaeger.name" . }}
+    jaeger-infra: query-deployment
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    component: query
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+{{- if .Values.query.annotations }}
+  annotations:
+{{ toYaml .Values.query.annotations | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ .Values.query.replicaCount }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+{{- if .Values.query.podAnnotations }}
+      annotations:
+{{ toYaml .Values.query.podAnnotations | indent 8 }}
+{{- end }}
+      labels:
+        app: {{ template "jaeger.name" . }}
+        component: query
+        release: {{ .Release.Name }}
+        jaeger-infra: query-pod
+{{- if .Values.query.podLabels }}
+{{ toYaml .Values.query.podLabels | indent 8 }}
+{{- end }}
+    spec:
+      nodeSelector:
+{{ toYaml .Values.query.nodeSelector | indent 8 }}
+{{- if .Values.query.tolerations }}
+      tolerations:
+{{ toYaml .Values.query.tolerations | indent 8 }}
+{{- end }}
+      containers:
+      - name: {{ template "jaeger.query.name" . }}
+        {{- if eq .Values.storage.type "aliyun-log" }}
+        args:
+        - /go/bin/query-linux
+        - --query.static-files=/go/jaeger-ui/
+        - --aliyun-log.project=$(ALIYUN_SLS_PROJECT)
+        - --aliyun-log.endpoint=$(ALIYUN_SLS_ENDPOINT)
+        - --aliyun-log.span-logstore=$(ALIYUN_SLS_LOGSTORE)
+        - --aliyun-log.alicloud-k8s-flag=true
+        {{- end }}
+        image: "{{ .Values.global.hub }}/{{ .Values.query.image }}:{{ .Values.query.tag }}"
+        imagePullPolicy: {{ .Values.query.pullPolicy }}
+        env:
+          {{- range $key, $value := .Values.query.cmdlineParams }}
+          - name: {{ $key | replace "." "_" | replace "-" "_" | upper | quote }}
+            value: {{ $value | quote }}
+          {{- end }}
+          - name: SPAN_STORAGE_TYPE
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: span-storage.type
+          {{- if eq .Values.storage.type "aliyun-log" }}
+          - name: ALIYUN_SLS_PROJECT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: aliyun-sls.project
+          - name: ALIYUN_SLS_ENDPOINT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: aliyun-sls.endpoint
+          - name: ALIYUN_SLS_LOGSTORE
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: aliyun-sls.logstore
+          {{- end }}
+          {{- if eq .Values.storage.type "cassandra" }}
+          - name: CASSANDRA_SERVERS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: cassandra.servers
+          - name: CASSANDRA_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: cassandra.port
+          - name: CASSANDRA_KEYSPACE
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: cassandra.keyspace
+          {{- end }}
+          {{- if eq .Values.storage.type "elasticsearch" }}
+          - name: ES_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: es.password
+          - name: ES_SERVER_URLS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: es.server-urls
+          - name: ES_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: es.username
+          {{- end }}
+          - name: QUERY_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: query.port
+          - name: QUERY_HEALTH_CHECK_HTTP_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "jaeger.fullname" . }}
+                key: query.health-check-http-port
+        ports:
+        - containerPort: {{ .Values.query.service.targetPort }}
+          protocol: TCP
+        resources:
+{{ toYaml .Values.query.resources | indent 10 }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.query.healthCheckPort }}
+      dnsPolicy: {{ .Values.query.dnsPolicy }}
+      restartPolicy: Always
+{{- end -}}

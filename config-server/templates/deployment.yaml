@@ -1,0 +1,46 @@
+{{- $root := . -}}
+{{ $fullname := include "configserver.fullname" . }}
+{{ $name := include "configserver.name" . }}
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ $fullname }}
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: config-server
+spec:
+  replicas:  {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  template:
+    metadata:
+      labels:
+        component: config-server
+    spec:
+      containers:
+      - name: config-server
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        readinessProbe:
+          httpGet:
+            path: /admin/health
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 20
+          timeoutSeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 5
+        volumeMounts:
+        - mountPath: /config
+          name: config-server-data
+      volumes:
+      - name: config-server-data
+        configMap:
+          name: {{ $fullname }}
+ {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}     

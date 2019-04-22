@@ -1,0 +1,57 @@
+dependencies:
+  - name: sidecarInjectorWebhook
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/sidecarInjectorWebhook
+    condition: sidecarInjectorWebhook.enabled
+  - name: security
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/security
+    condition: security.enabled
+  - name: ingress
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/ingress
+    condition: ingress.enabled
+  - name: gateways
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/gateways
+    condition: gateways.enabled
+  - name: mixer
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/mixer
+    condition: mixer.enabled
+  - name: pilot
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/pilot
+    condition: pilot.enabled
+  - name: grafana
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/grafana
+    condition: grafana.enabled
+  - name: prometheus
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/prometheus
+    condition: prometheus.enabled
+  - name: servicegraph
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/servicegraph
+    condition: servicegraph.enabled
+  # - name: tracing
+  #   version: 1.0.5
+  #   repository: file://../../istio-dependency/dep-charts/tracing
+  #   condition: tracing.enabled
+  - name: tracing-on-sls
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/tracing-on-sls
+    condition: tracing-on-sls.enabled
+  - name: galley
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/galley
+    condition: galley.enabled
+  - name: kiali
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/kiali
+    condition: kiali.enabled
+  - name: certmanager
+    version: 1.0.5
+    repository: file://../../istio-dependency/dep-charts/certmanager
+    condition: certmanager.enabled  

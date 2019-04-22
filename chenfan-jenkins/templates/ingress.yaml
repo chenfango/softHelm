@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: jenkins-dashboard
+spec:
+  rules:
+  - host: jenkins.ccfox.com
+    http:
+      paths:
+      - backend:
+          serviceName: jenkins-ci
+          servicePort: 8080
+

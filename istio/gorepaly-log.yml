@@ -1,0 +1,22 @@
+apiVersion: log.alibabacloud.com/v1alpha1      ## 默认值，无需改变
+kind: AliyunLogConfig                          ## 默认值，无需改变
+metadata:
+  name: goreplay                  ## 资源名，必须在集群内唯一
+spec:
+  logstore: goreplay                         ## Logstore名，不存在时自动创建
+  shardCount: 2                                ## [可选] logstore分区数，默认为2，支持1-10
+  lifeCycle: 90                                ## [可选] 该logstore存储时间，默认为90，支持1-7300，7300天为永久存储
+  logtailConfig:                               ## 详细配置
+    inputType: plugin                          ## 采集的输入类型，一般为file或plugin
+    configName: goreplay          ## 采集配置名，需要和资源名(metadata.name)一致
+    inputDetail:                               ## 详细配置信息，具体请参考示例
+      plugin:
+        inputs:
+          - type: service_docker_stdout
+            detail:
+              Stdout: true
+              Stderr: true
+              BeginLineCheckLength: 62
+              BeginLineRegex: "1\\s[\\w]{40}\\s[0-9]{19}"
+              IncludeLabel: 
+                io.kubernetes.container.name: "goreplay"

@@ -1,0 +1,194 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: axd-admin
+spec:
+  gateways:
+  - axd-admin
+  hosts:
+  - admin.aixiangdao.tech
+  http:
+  - match:
+    - headers:
+        environment:
+          exact: blue
+    route:
+    - destination:
+        host: axd-rms.blue.svc.cluster.local
+  - match:
+    - headers:
+        environment:
+          exact: green
+    route:
+    - destination:
+        host: axd-rms.green.svc.cluster.local
+  - route:
+    - destination:
+        host: axd-rms.blue.svc.cluster.local
+      weight: 100
+    - destination:
+        host: axd-rms.green.svc.cluster.local
+      weight: 0 
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: axd-rms
+spec:
+  gateways:
+  - axd-rms
+  hosts:
+  - rms.aixiangdao.tech
+  http:
+  - match:
+    - uri:
+        prefix: /{{ .Values.ingress.path }}
+    - uri:
+        prefix: /{{ .Release.Namespace }}
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: axd-rms.{{ .Release.Namespace }}.svc.cluster.local
+    corsPolicy:
+      allowOrigin:
+      - "*"
+      allowMethods:
+      - POST
+      - GET
+      - OPTIONS
+  - route:
+    - destination:
+        host: axd-gateway-rms.green.svc.cluster.local 
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: axd-gateway-admin
+spec:
+  gateways:
+  - axd-gateway-admin
+  hosts:
+  - api.admin.aixiangdao.tech
+  http:
+  - match:
+    - headers:
+        environment:
+          exact: blue
+    route:
+    - destination:
+        host: axd-gateway-rms.blue.svc.cluster.local
+  - match:
+    - headers:
+        environment:
+          exact: green
+    route:
+    - destination:
+        host: axd-gateway-rms.green.svc.cluster.local
+  - route:
+    - destination:
+        host: axd-gateway-rms.blue.svc.cluster.local
+      weight: 100
+    - destination:
+        host: axd-gateway-rms.green.svc.cluster.local
+      weight: 0
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: axd-gateway
+spec:
+  gateways:
+  - axd-gateway
+  hosts:
+  - api.aixiangdao.tech
+  http:
+  - match:
+    - headers:
+        environment:
+          exact: blue
+    route:
+    - destination:
+        host: axd-gateway.blue.svc.cluster.local
+  - match:
+    - headers:
+        environment:
+          exact: green
+    route:
+    - destination:
+        host: axd-gateway.green.svc.cluster.local
+  - route:
+    - destination:
+        host: axd-gateway.blue.svc.cluster.local
+      weight: 100
+    - destination:
+        host: axd-gateway.green.svc.cluster.local
+      weight: 0
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: axd-gateway-blue
+spec:
+  host: axd-gateway.blue.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    outlierDetection:
+      consecutiveErrors: 3
+      #interval: 10s
+      #baseEjectionTime: 30s
+      maxEjectionPercent: 50%
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: axd-gateway-green
+spec:
+  host: axd-gateway.green.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_CONN
+    outlierDetection:
+      consecutiveErrors: 5
+      #interval: 10s
+      #baseEjectionTime: 30s
+      maxEjectionPercent: 50%
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: axd-activity
+spec:
+  gateways:
+  - axd-activity
+  hosts:
+  - activity.aixiangdao.tech
+  http:
+  - match:
+    - headers:
+        environment:
+          exact: blue
+    route:
+    - destination:
+        host: axd-activity-ui.blue.svc.cluster.local
+  - match:
+    - headers:
+        environment:
+          exact: green
+    route:
+    - destination:
+        host: axd-activity-ui.green.svc.cluster.local
+  - route:
+    - destination:
+        host: axd-activity-ui.blue.svc.cluster.local
+      weight: 100
+    - destination:
+        host: axd-activity-ui.green.svc.cluster.local
+      weight: 0 

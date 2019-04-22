@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "xxl-job.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "xxl-job.name" . }}
+    helm.sh/chart: {{ include "xxl-job.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-id: lb-t4nll87cfnnbbhyguvpr7
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      nodePort: 31936
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "xxl-job.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

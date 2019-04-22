@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: istio-kiali
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - kiali.aixiangdao.tech
+    port:
+      name: http-kiali
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: istio-kiali
+spec:
+  gateways:
+  - istio-kiali
+  hosts:
+  - kiali.aixiangdao.tech
+  http:
+  - route:
+    - destination:
+        host: kiali.istio-system.svc.cluster.local

@@ -1,0 +1,17 @@
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: xxl-job
+# spec:
+#   rules:
+#   - host: xxljob.ccfox.com
+#     http:
+#       paths:
+#       - backend:
+#           serviceName: xxl-job
+#           servicePort: 8080
+#         path: /xxl-job-admin
+#   tls:
+#   - hosts:
+#     - xxljob.ccfox.com
+#     secretName: all-ccfox.com

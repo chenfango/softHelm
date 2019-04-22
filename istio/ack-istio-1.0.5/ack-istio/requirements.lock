@@ -1,0 +1,42 @@
+dependencies:
+- name: sidecarInjectorWebhook
+  repository: file://../../istio-dependency/dep-charts/sidecarInjectorWebhook
+  version: 1.0.5
+- name: security
+  repository: file://../../istio-dependency/dep-charts/security
+  version: 1.0.5
+- name: ingress
+  repository: file://../../istio-dependency/dep-charts/ingress
+  version: 1.0.5
+- name: gateways
+  repository: file://../../istio-dependency/dep-charts/gateways
+  version: 1.0.5
+- name: mixer
+  repository: file://../../istio-dependency/dep-charts/mixer
+  version: 1.0.5
+- name: pilot
+  repository: file://../../istio-dependency/dep-charts/pilot
+  version: 1.0.5
+- name: grafana
+  repository: file://../../istio-dependency/dep-charts/grafana
+  version: 1.0.5
+- name: prometheus
+  repository: file://../../istio-dependency/dep-charts/prometheus
+  version: 1.0.5
+- name: servicegraph
+  repository: file://../../istio-dependency/dep-charts/servicegraph
+  version: 1.0.5
+- name: tracing-on-sls
+  repository: file://../../istio-dependency/dep-charts/tracing-on-sls
+  version: 1.0.5
+- name: galley
+  repository: file://../../istio-dependency/dep-charts/galley
+  version: 1.0.5
+- name: kiali
+  repository: file://../../istio-dependency/dep-charts/kiali
+  version: 1.0.5
+- name: certmanager
+  repository: file://../../istio-dependency/dep-charts/certmanager
+  version: 1.0.5
+digest: sha256:ad5f0835de1ec32f0907b3d5b929b32f014d61086b9badb1815cb16419ad8a19
+generated: 2018-12-25T18:41:34.745412164+08:00

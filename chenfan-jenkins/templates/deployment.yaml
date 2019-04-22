@@ -1,0 +1,88 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  generation: 6
+  labels:
+    app: jenkins-ci
+  name: jenkins-ci
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: jenkins-ci
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:  
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jenkins-ci
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: ops
+                operator: In
+                values:
+                - jenkins
+      containers:
+      - image: registry-vpc.ap-southeast-1.aliyuncs.com/ccfox/jenkinsci-blueocean:alpine
+        imagePullPolicy: Always
+        name: jenkins-ci
+        ports:
+        - containerPort: 8080
+          name: admin
+          protocol: TCP
+        - containerPort: 50000
+          name: jnlp
+          protocol: TCP
+        resources: {}
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: data
+        - mountPath: /var/run/docker.sock
+          name: docker-sock
+        - mountPath: /root/.kube
+          name: cluster-admin
+        - mountPath: /usr/local/bin/kubectl
+          name: kubectl
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /home/jenkins_home
+          type: DirectoryOrCreate
+        name: jenkins-home
+      - hostPath:
+          path: /var/run/docker.sock
+          type: Socket
+        name: docker-sock
+      - configMap:
+          defaultMode: 420
+          name: cluster-admin
+        name: cluster-admin
+      - hostPath:
+          path: /usr/bin/kubectl
+          type: File
+        name: kubectl
+      - flexVolume:
+          driver: alicloud/disk
+          fsType: ext4
+          options:
+            volumeId: d-t4n3a2scxhy3ktyeyd2m
+        name: data

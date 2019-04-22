@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: newcoin-gateway-server
+spec:
+  rules:
+  - host: apitest.ccfox.com
+    http:
+      paths:
+      - backend:
+          serviceName: newcoin-gateway-server
+          servicePort: 8080
+        path: /
+  tls:
+  - hosts:
+    - mtest.ccfox.com
+    secretName: all-ccfox.com

@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "zipkin.fullname" . }}
+  labels:
+    app: {{ template "zipkin.name" . }}
+    chart: {{ template "zipkin.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "zipkin.name" . }}
+    release: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"zipkin"},"name":"zipkin","namespace":"zipkin"},"spec":{"ports":[{"name":"transport","port":9410,"protocol":"TCP","targetPort":9410},{"name":"api","port":9411,"protocol":"TCP","targetPort":9411}],"selector":{"app":"zipkin"},"sessionAffinity":"None","type":"ClusterIP"}}
+  creationTimestamp: 2018-10-05T06:12:45Z
+  labels:
+    app: zipkin
+  name: zipkin
+  namespace: zipkin
+  resourceVersion: "15914802"
+  selfLink: /api/v1/namespaces/zipkin/services/zipkin
+  uid: ad299028-c865-11e8-a7d1-00163e069477
+spec:
+  clusterIP: 172.26.9.173
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: transport
+    nodePort: 30287
+    port: 9410
+    protocol: TCP
+    targetPort: 9410
+  - name: api
+    nodePort: 30579
+    port: 9411
+    protocol: TCP
+    targetPort: 9411
+  selector:
+    app: zipkin
+  sessionAffinity: None
+  type: NodePort
+

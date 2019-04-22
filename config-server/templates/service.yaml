@@ -1,0 +1,25 @@
+{{- $root := . -}}
+{{ $fullname := include "configserver.fullname" . }}
+{{ $name := include "configserver.name" . }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullname }}
+  labels:
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: config-server
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-id: lb-t4nll87cfnnbbhyguvpr7
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - name: http
+    port: {{ .Values.service.externalPort }}
+    targetPort: {{ .Values.service.internalPort }}
+    protocol: TCP
+  selector:
+    component: config-server

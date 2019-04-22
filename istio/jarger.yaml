@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  generation: 1
+  name: istio-jaeger-ui
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - jaeger.aixiangdao.tech
+    port:
+      name: http-jaeger
+      number: 80
+      protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  generation: 1
+  name: istio-jaeger
+spec:
+  gateways:
+  - istio-jaeger
+  hosts:
+  - jaeger.aixiangdao.tech
+  http:
+  - route:
+    - destination:
+        host: tracing-on-sls-query.istio-system.svc.cluster.local

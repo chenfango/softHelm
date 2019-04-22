@@ -1,0 +1,125 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  generation: 1
+  labels:
+    kube-app: apollo-portal
+  name: apollo-portal
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      kube-app: apollo-portal
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kube-app: apollo-portal
+    spec:
+      containers:
+      - image: registry-vpc.cn-shenzhen.aliyuncs.com/axd/apollo-portal:1.2.0
+        imagePullPolicy: Always
+        name: apollo-portal
+        ports:
+        - containerPort: 8070
+          name: http
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /apollo-portal/config/application-github.properties
+          name: config
+          subPath: application-github.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      volumes:
+      - configMap:
+          name: apollo-portal
+        name: config
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nodetype
+                operator: In
+                values:
+                - prod
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    kube-app: apollo
+  name: apollo
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      kube-app: apollo
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kube-app: apollo
+    spec:
+      containers:
+      - image: registry-vpc.cn-shenzhen.aliyuncs.com/axd/apollo-adminservice:1.2.0
+        imagePullPolicy: Always
+        name: apollo-adminservice
+        ports:
+        - containerPort: 8080
+          name: admin
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /apollo-adminservice/config/application-github.properties
+          name: config
+          subPath: application-github.properties
+      - image: registry-vpc.cn-shenzhen.aliyuncs.com/axd/apollo-configservice:1.2.0
+        imagePullPolicy: Always
+        name: apollo-configservice
+        ports:
+        - containerPort: 8080
+          name: config
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /apollo-configservice/config/application-github.properties
+          name: config
+          subPath: application-github.properties
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      volumes:
+      - configMap:
+          name: apollo-config
+        name: config
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nodetype
+                operator: In 
+                values:
+                - prod
+
+

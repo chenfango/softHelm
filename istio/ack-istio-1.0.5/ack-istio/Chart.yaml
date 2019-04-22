@@ -1,0 +1,18 @@
+apiVersion: v1
+appVersion: 1.0.5
+description: Helm chart of all istio components for Kubernetes on Alibaba Cloud Container
+  Service
+engine: gotpl
+icon: https://istio.io/favicons/android-192x192.png
+keywords:
+- istio
+- security
+- sidecarInjectorWebhook
+- mixer
+- pilot
+- galley
+name: ack-istio
+sources:
+- http://github.com/istio/istio
+tillerVersion: '>=2.10.0-0'
+version: 1.0.5
