@@ -1,0 +1,28 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: apollo-configservice-prod-ingress
+spec:
+  rules:
+  - host: apollo.aixiangdao.cn
+    http:
+      paths:
+      - backend:
+          serviceName: apollo-configservice
+          servicePort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  generation: 1
+  name: apollo-portal-prod-ingress
+spec:
+  rules:
+  - host: portal.apollo.aixiangdao.cn
+    http:
+      paths:
+      - backend:
+          serviceName: apollo-portal
+          servicePort: 8070

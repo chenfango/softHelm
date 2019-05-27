@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    kube-svc: apollo-configservice
+  name: apollo-configservice
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: admin
+    port: 8090
+    protocol: TCP
+    targetPort: 8090
+  - name: config
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    kube-app: apollo
+  sessionAffinity: None
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    kube-svc: apollo-portal
+  name: apollo-portal
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    port: 8070
+    protocol: TCP
+    targetPort: 8070
+  selector:
+    kube-app: apollo-portal
+  sessionAffinity: None
+  type: NodePort
+
